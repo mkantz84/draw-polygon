@@ -80,3 +80,22 @@ npx vitest run tests/dal tests/services
 ---
 
 For any questions, please refer to the code or contact the maintainer.
+
+---
+
+## Docker Usage & Best Practices
+
+- **Do not delete `package-lock.json` from the repo.**
+- **Do not copy or add your local `node_modules` into the Docker image.**
+- The Dockerfile will install all dependencies inside the container for the correct architecture.
+- The `.dockerignore` file ensures local build artifacts and dependencies are not sent to Docker.
+- Native modules (like `sqlite3`) are rebuilt inside the container as needed.
+
+To build and run the Docker image:
+
+```bash
+docker build -t draw-polygon-app .
+docker run -p 3000:3000 draw-polygon-app
+```
+
+---

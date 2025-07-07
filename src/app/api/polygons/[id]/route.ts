@@ -5,10 +5,8 @@ import { polygonService } from "@/lib/services/polygon.service";
 
 // DELETE /api/polygons/[id] - Delete a polygon by ID
 export const DELETE = withDbInit(
-  withDelay(async function DELETE(
-    request: NextRequest,
-    context: { params: { id: string } }
-  ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  withDelay(async function DELETE(request: NextRequest, context: any) {
     try {
       // the await is added due a next issue where it thinks params is async during runtime
       const params = await context.params;
@@ -45,10 +43,8 @@ export const DELETE = withDbInit(
 
 // PUT /api/polygons/[id] - Update a polygon by ID
 export const PUT = withDbInit(
-  withDelay(async function PUT(
-    request: NextRequest,
-    context: { params: { id: string } }
-  ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  withDelay(async function PUT(request: NextRequest, context: any) {
     try {
       // the await is added due a next issue where it thinks params is async during runtime
       const params = await context.params;
