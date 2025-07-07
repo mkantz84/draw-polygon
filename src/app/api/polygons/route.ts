@@ -3,11 +3,22 @@ import { withDbInit } from "@/lib/utils/dbInit";
 import { withDelay } from "@/lib/utils/delay";
 import { polygonService } from "@/lib/services/polygon.service";
 
-// GET /api/polygons - Fetch all polygons
+// GET /api/polygons - Fetch all or paginated polygons
 export const GET = withDbInit(
-  withDelay(async function GET() {
+  withDelay(async function GET(request: NextRequest) {
     try {
-      const polygons = await polygonService.getAll();
+      const { searchParams } = new URL(request.url);
+      const offset = searchParams.get("offset");
+      const limit = searchParams.get("limit");
+      let polygons;
+      if (offset != null && limit != null) {
+        polygons = await polygonService.getPaginated(
+          Number(offset),
+          Number(limit)
+        );
+      } else {
+        polygons = await polygonService.getAll();
+      }
       return NextResponse.json(polygons);
     } catch (error) {
       console.error("Error fetching polygons:", error);

@@ -3,7 +3,7 @@ export const addDelay = (ms: number = 5000) =>
 
 export function withDelay<Args extends unknown[], R>(
   handler: (...args: Args) => Promise<R>,
-  ms: number = 5000
+  ms: number = 1000
 ): (...args: Args) => Promise<R> {
   return async (...args: Args) => {
     await addDelay(ms);
