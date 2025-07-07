@@ -6,8 +6,7 @@ import {
   deletePolygon,
   Polygon,
 } from "@/network/polygons";
-
-const PAGE_SIZE = 15;
+import { PAGE_SIZE } from "@/lib/constants";
 
 function getErrorMessage(err: unknown, fallback = "Unknown error") {
   if (typeof err === "object" && err !== null && "message" in err) {

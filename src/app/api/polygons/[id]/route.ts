@@ -10,6 +10,7 @@ export const DELETE = withDbInit(
     context: { params: { id: string } }
   ) {
     try {
+      // the await is added due a next issue where it thinks params is async during runtime
       const params = await context.params;
       const id = parseInt(params.id);
 
@@ -49,6 +50,7 @@ export const PUT = withDbInit(
     context: { params: { id: string } }
   ) {
     try {
+      // the await is added due a next issue where it thinks params is async during runtime
       const params = await context.params;
       const id = parseInt(params.id);
       if (isNaN(id)) {

@@ -37,7 +37,6 @@ class PolygonService {
   }
 
   public async delete(id: number): Promise<boolean> {
-    // Add business logic here if needed
     return deletePolygon(id);
   }
 
