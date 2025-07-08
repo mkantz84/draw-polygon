@@ -20,6 +20,7 @@ type PolygonListProps = {
   loading?: boolean;
   fetchMorePolygons?: () => void;
   hasMore?: boolean;
+  disabled?: boolean;
 };
 
 const PolygonList: React.FC<PolygonListProps> = ({
@@ -30,10 +31,12 @@ const PolygonList: React.FC<PolygonListProps> = ({
   loading,
   fetchMorePolygons,
   hasMore,
+  disabled = false,
 }) => {
   const { deletingId, setDeletingId, showArrow, scrollRef } = usePolygonList();
 
   const handleDelete = async (id: number) => {
+    if (disabled) return;
     setDeletingId(id);
     await onDelete(id);
     setDeletingId(null);
@@ -48,7 +51,9 @@ const PolygonList: React.FC<PolygonListProps> = ({
       <h2 className="text-xl font-bold mb-3 text-slate-800">Saved Polygons</h2>
       <div
         id="polygon-list-scrollable"
-        className="relative h-[488px] max-h-[488px] overflow-y-scroll scrollbar scrollbar-thumb-blue-300 scrollbar-track-blue-100 scrollbar-thumb-rounded-full scrollbar-w-2"
+        className={`relative h-[488px] max-h-[488px] overflow-y-scroll scrollbar scrollbar-thumb-blue-300 scrollbar-track-blue-100 scrollbar-thumb-rounded-full scrollbar-w-2 ${
+          disabled ? "opacity-60 pointer-events-none" : ""
+        }`}
         ref={scrollRef}
       >
         {loading && polygons.length === 0 ? (
@@ -66,7 +71,12 @@ const PolygonList: React.FC<PolygonListProps> = ({
             {polygons.length === 0 ? (
               <p className="text-gray-500">No polygons saved yet.</p>
             ) : (
-              <ul className="space-y-2" role="list">
+              <ul
+                className={`space-y-2 ${
+                  disabled ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+                role="list"
+              >
                 {polygons.map((poly) => (
                   <li
                     key={poly.id}
@@ -76,10 +86,11 @@ const PolygonList: React.FC<PolygonListProps> = ({
                           ? "bg-blue-100 border-2 border-blue-500"
                           : "hover:bg-blue-50 focus:bg-blue-50 border border-transparent"
                       }`}
-                    onClick={() => onSelect(poly)}
+                    onClick={() => !disabled && onSelect(poly)}
                     tabIndex={0}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") onSelect(poly);
+                      if (!disabled && (e.key === "Enter" || e.key === " "))
+                        onSelect(poly);
                     }}
                     aria-current={selectedId === poly.id ? "true" : undefined}
                     role="listitem"
@@ -95,11 +106,11 @@ const PolygonList: React.FC<PolygonListProps> = ({
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(poly.id);
+                        if (!disabled) handleDelete(poly.id);
                       }}
                       tabIndex={0}
                       aria-label={`Delete polygon ${poly.name}`}
-                      disabled={deletingId === poly.id}
+                      disabled={deletingId === poly.id || disabled}
                     >
                       Delete
                     </button>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withDbInit } from "@/lib/utils/dbInit";
 import { withDelay } from "@/lib/utils/delay";
 import { polygonService } from "@/lib/services/polygon.service";
+import { isValidPoints } from "./validate";
 
 // GET /api/polygons - Fetch all or paginated polygons
 export const GET = withDbInit(
@@ -41,6 +42,12 @@ export const POST = withDbInit(
       if (!name || !points || !Array.isArray(points)) {
         return NextResponse.json(
           { error: "Name and points array are required" },
+          { status: 400 }
+        );
+      }
+      if (!isValidPoints(points)) {
+        return NextResponse.json(
+          { error: "Points must be an array of [number, number] pairs" },
           { status: 400 }
         );
       }

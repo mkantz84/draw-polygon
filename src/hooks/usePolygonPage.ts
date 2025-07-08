@@ -25,6 +25,7 @@ export function usePolygonPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Fetch first page on mount or after new polygon is added
   const fetchFirstPage = useCallback(async () => {
@@ -81,6 +82,7 @@ export function usePolygonPage() {
       try {
         if (selectedPolygon) {
           // Update existing polygon
+          setIsUpdating(true);
           const updated = await updatePolygon(
             selectedPolygon.id,
             polygonName,
@@ -102,6 +104,7 @@ export function usePolygonPage() {
         setError(getErrorMessage(err));
       } finally {
         setLoading(false);
+        setIsUpdating(false);
       }
     },
     [drawing, selectedPolygon, fetchFirstPage]
@@ -111,6 +114,7 @@ export function usePolygonPage() {
   const handleDelete = useCallback(
     async (id: number) => {
       setLoading(true);
+      setIsUpdating(true);
       setError(null);
       try {
         await deletePolygon(id);
@@ -122,6 +126,7 @@ export function usePolygonPage() {
         setError(getErrorMessage(err));
       } finally {
         setLoading(false);
+        setIsUpdating(false);
       }
     },
     [selectedPolygon]
@@ -147,5 +152,6 @@ export function usePolygonPage() {
     deselectPolygon,
     fetchMorePolygons,
     hasMore,
+    isUpdating,
   };
 }

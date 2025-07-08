@@ -8,6 +8,5 @@ module.exports = {
         pathname: "/**", // allow all paths under picsum.photos
       },
     ],
-    domains: ["picsum.photos"],
   },
 };
