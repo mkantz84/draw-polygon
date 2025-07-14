@@ -11,12 +11,22 @@ describe("PolygonForm", () => {
     expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
   });
 
-  it("calls onSave with input value", async () => {
+  it("calls onSave with input value when name is provided", async () => {
     const onSave = vi.fn();
     const setName = vi.fn();
     render(<PolygonForm name="poly" setName={setName} onSave={onSave} />);
-    await userEvent.click(screen.getByRole("button", { name: /save/i }));
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    expect(saveButton).toBeEnabled();
+    await userEvent.click(saveButton);
     expect(onSave).toHaveBeenCalledWith("poly");
+  });
+
+  it("disables save button when name is empty", () => {
+    const onSave = vi.fn();
+    const setName = vi.fn();
+    render(<PolygonForm name="" setName={setName} onSave={onSave} />);
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    expect(saveButton).toBeDisabled();
   });
 
   it("shows edit mode and calls onDeselect", async () => {

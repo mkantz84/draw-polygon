@@ -21,6 +21,7 @@ type PolygonListProps = {
   fetchMorePolygons?: () => void;
   hasMore?: boolean;
   disabled?: boolean;
+  deletingPolygonId?: number | null;
 };
 
 const PolygonList: React.FC<PolygonListProps> = ({
@@ -32,14 +33,13 @@ const PolygonList: React.FC<PolygonListProps> = ({
   fetchMorePolygons,
   hasMore,
   disabled = false,
+  deletingPolygonId,
 }) => {
-  const { deletingId, setDeletingId, showArrow, scrollRef } = usePolygonList();
+  const { showArrow, scrollRef } = usePolygonList();
 
   const handleDelete = async (id: number) => {
-    if (disabled) return;
-    setDeletingId(id);
+    if (disabled || deletingPolygonId != null) return; // Disable if overall disabled or another polygon is deleting
     await onDelete(id);
-    setDeletingId(null);
   };
 
   return (
@@ -52,7 +52,9 @@ const PolygonList: React.FC<PolygonListProps> = ({
       <div
         id="polygon-list-scrollable"
         className={`relative h-[488px] max-h-[488px] overflow-y-scroll scrollbar scrollbar-thumb-blue-300 scrollbar-track-blue-100 scrollbar-thumb-rounded-full scrollbar-w-2 ${
-          disabled ? "opacity-60 pointer-events-none" : ""
+          disabled || deletingPolygonId != null
+            ? "opacity-60 pointer-events-none"
+            : ""
         }`}
         ref={scrollRef}
       >
@@ -73,7 +75,9 @@ const PolygonList: React.FC<PolygonListProps> = ({
             ) : (
               <ul
                 className={`space-y-2 ${
-                  disabled ? "opacity-60 cursor-not-allowed" : ""
+                  disabled || deletingPolygonId != null
+                    ? "opacity-60 cursor-not-allowed"
+                    : ""
                 }`}
                 role="list"
               >
@@ -86,10 +90,15 @@ const PolygonList: React.FC<PolygonListProps> = ({
                           ? "bg-blue-100 border-2 border-blue-500"
                           : "hover:bg-blue-50 focus:bg-blue-50 border border-transparent"
                       }`}
-                    onClick={() => !disabled && onSelect(poly)}
+                    onClick={() =>
+                      !(disabled || deletingPolygonId != null) && onSelect(poly)
+                    }
                     tabIndex={0}
                     onKeyDown={(e) => {
-                      if (!disabled && (e.key === "Enter" || e.key === " "))
+                      if (
+                        !(disabled || deletingPolygonId != null) &&
+                        (e.key === "Enter" || e.key === " ")
+                      )
                         onSelect(poly);
                     }}
                     aria-current={selectedId === poly.id ? "true" : undefined}
@@ -100,19 +109,27 @@ const PolygonList: React.FC<PolygonListProps> = ({
                     </span>
                     <button
                       className={`ml-4 px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 cursor-pointer ${
-                        deletingId === poly.id
+                        deletingPolygonId === poly.id
                           ? "opacity-60 cursor-not-allowed"
                           : ""
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!disabled) handleDelete(poly.id);
+                        handleDelete(poly.id);
                       }}
                       tabIndex={0}
-                      aria-label={`Delete polygon ${poly.name}`}
-                      disabled={deletingId === poly.id || disabled}
+                      aria-label={
+                        deletingPolygonId === poly.id
+                          ? "Deleting..."
+                          : `Delete polygon ${poly.name}`
+                      }
+                      disabled={deletingPolygonId != null}
                     >
-                      Delete
+                      {deletingPolygonId === poly.id ? (
+                        <Loader size="sm" />
+                      ) : (
+                        "Delete"
+                      )}
                     </button>
                   </li>
                 ))}

@@ -45,9 +45,10 @@ export const POST = withDbInit(
           { status: 400 }
         );
       }
-      if (!isValidPoints(points)) {
+      const validationResult = isValidPoints(points);
+      if (!validationResult.valid) {
         return NextResponse.json(
-          { error: "Points must be an array of [number, number] pairs" },
+          { error: validationResult.message },
           { status: 400 }
         );
       }

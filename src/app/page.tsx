@@ -22,6 +22,8 @@ export default function HomePage() {
     fetchMorePolygons,
     hasMore,
     isUpdating,
+    isPathClosed,
+    deletingPolygonId,
   } = usePolygonPage();
 
   return (
@@ -40,7 +42,9 @@ export default function HomePage() {
             <PolygonCanvas points={drawing} onChange={setDrawing} />
             <PolygonForm
               onSave={handleSaveOrUpdate}
-              disabled={isUpdating || loading || drawing.length === 0}
+              disabled={
+                isUpdating || loading || drawing.length === 0 || !isPathClosed
+              }
               name={name}
               setName={setName}
               isEdit={!!selectedPolygon}
@@ -55,9 +59,10 @@ export default function HomePage() {
               onSelect={setSelectedPolygon}
               selectedId={selectedPolygon?.id ?? null}
               loading={loading}
-              disabled={isUpdating}
+              disabled={isUpdating || deletingPolygonId != null}
               fetchMorePolygons={fetchMorePolygons}
               hasMore={hasMore}
+              deletingPolygonId={deletingPolygonId}
             />
           </div>
         </div>

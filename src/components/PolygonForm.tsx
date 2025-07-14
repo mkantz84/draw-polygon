@@ -50,7 +50,7 @@ const PolygonForm: React.FC<PolygonFormProps> = ({
       <button
         type="submit"
         className="px-6 py-2 bg-blue-600 text-white text-lg rounded shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50"
-        disabled={disabled}
+        disabled={disabled || !name.trim()}
       >
         {isEdit ? "Update" : "Save"}
       </button>

@@ -68,6 +68,8 @@ describe("PolygonList", () => {
         selectedId={null}
         loading={false}
         hasMore={false}
+        deletingPolygonId={null}
+        disabled={false}
       />
     );
     await userEvent.click(screen.getByText("Triangle"));
@@ -83,11 +85,29 @@ describe("PolygonList", () => {
         selectedId={null}
         loading={false}
         hasMore={false}
+        deletingPolygonId={null}
+        disabled={false}
       />
     );
     await userEvent.click(
       screen.getAllByRole("button", { name: /delete/i })[0]
     );
     expect(onDelete).toHaveBeenCalledWith(polygons[0].id);
+  });
+
+  it("shows loader when deleting a polygon", () => {
+    render(
+      <PolygonList
+        polygons={polygons}
+        onDelete={onDelete}
+        onSelect={onSelect}
+        selectedId={null}
+        loading={false}
+        hasMore={false}
+        deletingPolygonId={polygons[0].id}
+        disabled={false}
+      />
+    );
+    expect(screen.getByLabelText("Deleting...")).toBeInTheDocument();
   });
 });

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
 export function usePolygonList() {
-  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [showArrow, setShowArrow] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -23,8 +22,6 @@ export function usePolygonList() {
   }, []);
 
   return {
-    deletingId,
-    setDeletingId,
     showArrow,
     scrollRef,
   };

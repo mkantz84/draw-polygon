@@ -7,6 +7,7 @@ import {
   Polygon,
 } from "@/network/polygons";
 import { PAGE_SIZE } from "@/lib/constants";
+import { isClosed } from "@/lib/utils/polygonValidation";
 
 function getErrorMessage(err: unknown, fallback = "Unknown error") {
   if (typeof err === "object" && err !== null && "message" in err) {
@@ -26,6 +27,11 @@ export function usePolygonPage() {
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [deletingPolygonId, setDeletingPolygonId] = useState<number | null>(
+    null
+  );
+
+  const isPathClosed = isClosed(drawing);
 
   // Fetch first page on mount or after new polygon is added
   const fetchFirstPage = useCallback(async () => {
@@ -96,7 +102,6 @@ export function usePolygonPage() {
           // Create new polygon
           setPolygons([]);
           await createPolygon(polygonName, drawing);
-          await fetchFirstPage();
         }
         setDrawing([]);
         setName("");
@@ -105,6 +110,7 @@ export function usePolygonPage() {
       } finally {
         setLoading(false);
         setIsUpdating(false);
+        await fetchFirstPage();
       }
     },
     [drawing, selectedPolygon, fetchFirstPage]
@@ -115,6 +121,7 @@ export function usePolygonPage() {
     async (id: number) => {
       setLoading(true);
       setIsUpdating(true);
+      setDeletingPolygonId(id); // Set deleting ID
       setError(null);
       try {
         await deletePolygon(id);
@@ -124,12 +131,14 @@ export function usePolygonPage() {
         }
       } catch (err: unknown) {
         setError(getErrorMessage(err));
+        await fetchFirstPage(); // Refetch on error
       } finally {
         setLoading(false);
         setIsUpdating(false);
+        setDeletingPolygonId(null); // Clear deleting ID
       }
     },
-    [selectedPolygon]
+    [selectedPolygon, fetchFirstPage]
   );
 
   // Deselect polygon
@@ -153,5 +162,7 @@ export function usePolygonPage() {
     fetchMorePolygons,
     hasMore,
     isUpdating,
+    isPathClosed,
+    deletingPolygonId,
   };
 }
